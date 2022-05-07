@@ -102,7 +102,7 @@ public class Task {
     /**
      * Метод возвращает время начала выполнения повторяемой задачи.
      *
-     * @return если задача не неповторяемая, возвращается время выполения задачи.
+     * @return если задача неповторяемая, возвращается время выполения задачи.
      */
     public int getStartTime() {
         if (isRepeated()) {
@@ -158,5 +158,37 @@ public class Task {
      */
     public boolean isRepeated() {
         return repeatInterval != 0;
+    }
+
+    /**
+     * Метод возвращает время выполнения задачи относительно текущего момента времени.
+     *
+     * @param current текущее время.
+     * @return если задача неактивна или завершена возвращается -1.
+     */
+    public int nextTimeAfter(int current) {
+        if (!isActive()) {
+            return -1;
+        }
+        if (isRepeated()) {
+            if (startTime > current) {
+                return startTime;
+            } else if ((endTime - repeatInterval) <= current) {
+                return -1;
+            } else {
+                int nextTaskTime = startTime;
+                while (true) {
+                    nextTaskTime = nextTaskTime + repeatInterval;
+
+                    if (nextTaskTime > current) {
+                        return nextTaskTime;
+                    }
+                }
+            }
+        } else if (time > current) {
+            return time;
+        } else {
+            return -1;
+        }
     }
 }
