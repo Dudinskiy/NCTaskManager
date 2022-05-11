@@ -1,5 +1,7 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
+import java.util.Objects;
+
 public class Task {
     private String title;
     private int time;
@@ -190,5 +192,18 @@ public class Task {
         } else {
             return -1;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Task)) return false;
+        Task task = (Task) o;
+        return getTime() == task.getTime() && getStartTime() == task.getStartTime() && getEndTime() == task.getEndTime() && getRepeatInterval() == task.getRepeatInterval() && isActive() == task.isActive() && getTitle().equals(task.getTitle());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTitle(), getTime(), getStartTime(), getEndTime(), getRepeatInterval(), isActive());
     }
 }
