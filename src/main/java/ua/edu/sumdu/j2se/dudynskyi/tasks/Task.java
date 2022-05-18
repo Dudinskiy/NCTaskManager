@@ -16,7 +16,10 @@ public class Task {
      * @param title название задачи.
      * @param time  время выполнения задачи.
      */
-    public Task(String title, int time) {
+    public Task(String title, int time){
+        if (time < 0) {
+            throw new IllegalArgumentException("Время не может быть отрицательным");
+        }
         this.title = title;
         this.time = time;
     }
@@ -30,7 +33,16 @@ public class Task {
      * @param end      время окончания выполнения задачи.
      * @param interval интервал времени, с которым выполняется задача.
      */
-    public Task(String title, int start, int end, int interval) {
+    public Task(String title, int start, int end, int interval){
+        if (start < 0 || end < 0) {
+            throw new IllegalArgumentException("Время не должно быть отрицательным");
+        }
+        if (start >= end) {
+            throw new IllegalArgumentException("Время начала задачи должно быть меньше времени конца");
+        }
+        if (interval <= 0) {
+            throw new IllegalArgumentException("Интервал должен быть больше 0");
+        }
         this.title = title;
         this.startTime = start;
         this.endTime = end;

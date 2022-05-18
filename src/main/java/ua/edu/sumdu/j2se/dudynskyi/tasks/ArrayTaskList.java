@@ -73,11 +73,10 @@ public class ArrayTaskList {
      * @return если значение индекса равно или больше количества задач, возвращается null.
      */
     public Task getTask(int index) {
-        if (index < taskAmount) {
-            return taskList[index];
-        } else {
-            return null;
+        if (index > taskList.length - 1) {
+            throw new IndexOutOfBoundsException();
         }
+        return taskList[index];
     }
 
     /**
