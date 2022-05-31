@@ -1,10 +1,10 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
-public class LinkedTaskList {
+public class LinkedTaskList extends AbstractTaskList {
 
     private Cell first;
     private Cell last;
-    private int taskAmount;
+
 
     public void add(Task task) {
         if (task == null) {
@@ -68,16 +68,6 @@ public class LinkedTaskList {
             currentCell = currentCell.next;
         }
         return null;
-    }
-
-    public LinkedTaskList incoming(int from, int to) {
-        LinkedTaskList result = new LinkedTaskList();
-        for (int i = 0; i < size(); i++) {
-            if (getTask(i).nextTimeAfter(from) > from && getTask(i).nextTimeAfter(to) < to) {
-                result.add(getTask(i));
-            }
-        }
-        return result;
     }
 
     private static class Cell {
