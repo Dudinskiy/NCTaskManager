@@ -1,8 +1,8 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
-public class ArrayTaskList {
+public class ArrayTaskList extends AbstractTaskList{
     private Task[] taskList;
-    private int taskAmount;
+
 
     /**
      * Данный конструктор создает список задач с размером по умолчанию 10.
@@ -77,22 +77,5 @@ public class ArrayTaskList {
             throw new IndexOutOfBoundsException();
         }
         return taskList[index];
-    }
-
-    /**
-     * Метод возвращает список выполняемых задач в заданном диапазоне времени.
-     *
-     * @param from начальное время.
-     * @param to   конечное время.
-     * @return в случае отсутствия выполняемых задач возвращается пустой список.
-     */
-    public ArrayTaskList incoming(int from, int to) {
-        ArrayTaskList result = new ArrayTaskList();
-        for (int i = 0; i < size(); i++) {
-            if (getTask(i).nextTimeAfter(from) > from && getTask(i).nextTimeAfter(to) < to) {
-                result.add(getTask(i));
-            }
-        }
-        return result;
     }
 }
