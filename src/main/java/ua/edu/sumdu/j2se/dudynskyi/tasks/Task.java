@@ -2,7 +2,7 @@ package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
 import java.util.Objects;
 
-public class Task {
+public class Task implements Cloneable {
     private String title;
     private int time;
     private int startTime;
@@ -16,7 +16,7 @@ public class Task {
      * @param title название задачи.
      * @param time  время выполнения задачи.
      */
-    public Task(String title, int time){
+    public Task(String title, int time) {
         if (time < 0) {
             throw new IllegalArgumentException("Время не может быть отрицательным");
         }
@@ -33,7 +33,7 @@ public class Task {
      * @param end      время окончания выполнения задачи.
      * @param interval интервал времени, с которым выполняется задача.
      */
-    public Task(String title, int start, int end, int interval){
+    public Task(String title, int start, int end, int interval) {
         if (start < 0 || end < 0) {
             throw new IllegalArgumentException("Время не должно быть отрицательным");
         }
@@ -175,10 +175,12 @@ public class Task {
     }
 
     /**
-     * Метод возвращает время выполнения задачи относительно текущего момента времени.
+     * Метод возвращает время выполнения задачи
+     * относительно текущего момента времени.
      *
      * @param current текущее время.
-     * @return если задача неактивна или завершена возвращается -1.
+     * @return если задача неактивна или завершена
+     * возвращается -1.
      */
     public int nextTimeAfter(int current) {
         if (!isActive()) {
@@ -208,14 +210,45 @@ public class Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Task)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Task)) {
+            return false;
+        }
         Task task = (Task) o;
-        return getTime() == task.getTime() && getStartTime() == task.getStartTime() && getEndTime() == task.getEndTime() && getRepeatInterval() == task.getRepeatInterval() && isActive() == task.isActive() && getTitle().equals(task.getTitle());
+        return getTime() == task.getTime()
+                && getStartTime() == task.getStartTime()
+                && getEndTime() == task.getEndTime()
+                && getRepeatInterval() == task.getRepeatInterval()
+                && isActive() == task.isActive()
+                && getTitle().equals(task.getTitle());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTitle(), getTime(), getStartTime(), getEndTime(), getRepeatInterval(), isActive());
+        return Objects.hash(getTitle()
+                , getTime()
+                , getStartTime()
+                , getEndTime()
+                , getRepeatInterval()
+                , isActive());
+    }
+
+    @Override
+    public Task clone() throws CloneNotSupportedException {
+        return (Task) super.clone();
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "title='" + title + '\'' +
+                ", time=" + time +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", repeatInterval=" + repeatInterval +
+                ", active=" + active +
+                '}';
     }
 }

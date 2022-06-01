@@ -1,14 +1,18 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
-public class ArrayTaskList extends AbstractTaskList{
+import java.util.Arrays;
+import java.util.Iterator;
+
+public class ArrayTaskList extends AbstractTaskList implements Cloneable {
     private Task[] taskList;
+    private static final int DEFAULT_CAPACITY = 10;
 
 
     /**
      * Данный конструктор создает список задач с размером по умолчанию 10.
      */
     public ArrayTaskList() {
-        taskList = new Task[10];
+        taskList = new Task[DEFAULT_CAPACITY];
     }
 
     /**
@@ -77,5 +81,73 @@ public class ArrayTaskList extends AbstractTaskList{
             throw new IndexOutOfBoundsException();
         }
         return taskList[index];
+    }
+
+    @Override
+    public Iterator<Task> iterator() {
+        return new ArrIterator();
+    }
+
+    @Override
+    public ArrayTaskList clone() throws CloneNotSupportedException {
+        ArrayTaskList clone = (ArrayTaskList) super.clone();
+        clone.taskList = taskList.clone();
+        for (int i = 0; i < size(); i++) {
+            Task taskClone = taskList[i].clone();
+            clone.taskList[i] = taskClone;
+        }
+        return clone;
+    }
+
+    private class ArrIterator implements Iterator<Task> {
+
+        int nextForReturn;
+        int lastReturned = -1;
+
+        @Override
+        public boolean hasNext() {
+            return nextForReturn < taskAmount;
+        }
+
+        @Override
+        public Task next() {
+            lastReturned = nextForReturn;
+            nextForReturn++;
+            return taskList[lastReturned];
+        }
+
+        @Override
+        public void remove() {
+            Task task = taskList[lastReturned];
+            ArrayTaskList.this.remove(task);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ArrayTaskList)) {
+            return false;
+        }
+        ArrayTaskList taskList1 = (ArrayTaskList) o;
+        return Arrays.equals(taskList, taskList1.taskList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(taskList);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("ArrayTaskList{\n");
+        for (int i = 0; i < taskAmount; i++) {
+            sb.append(taskList[i].toString()).append(",").append("\n");
+        }
+        sb.append(", taskAmount=").append(taskAmount).append('}');
+
+        return sb.toString();
     }
 }
