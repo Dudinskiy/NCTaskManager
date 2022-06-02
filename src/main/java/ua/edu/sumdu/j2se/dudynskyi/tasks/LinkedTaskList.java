@@ -88,7 +88,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
     @Override
     public Iterator<Task> iterator() {
-        return new LinkedIterator();
+        return new Iter();
     }
 
     public Task[] listToArray() {
@@ -117,7 +117,8 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(first, last);
+        Task[] arr = listToArray();
+        return Arrays.hashCode(arr);
     }
 
     @Override
@@ -158,7 +159,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
         }
     }
 
-    private class LinkedIterator implements Iterator<Task> {
+    private class Iter implements Iterator<Task> {
 
         int nextForReturn;
         int lastReturned = -1;
@@ -179,8 +180,12 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
         @Override
         public void remove() {
+            if (lastReturned < 0) {
+                throw new IllegalStateException();
+            }
             Task task = getTask(lastReturned);
             LinkedTaskList.this.remove(task);
+            nextForReturn--;
         }
     }
 }

@@ -85,7 +85,7 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
 
     @Override
     public Iterator<Task> iterator() {
-        return new ArrIterator();
+        return new Iter();
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
         return clone;
     }
 
-    private class ArrIterator implements Iterator<Task> {
+    private class Iter implements Iterator<Task> {
 
         int nextForReturn;
         int lastReturned = -1;
@@ -118,8 +118,12 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
 
         @Override
         public void remove() {
+            if (lastReturned < 0) {
+                throw new IllegalStateException();
+            }
             Task task = taskList[lastReturned];
             ArrayTaskList.this.remove(task);
+            nextForReturn--;
         }
     }
 

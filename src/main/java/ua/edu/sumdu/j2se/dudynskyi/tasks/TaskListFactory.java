@@ -8,7 +8,7 @@ public class TaskListFactory {
         } else if (ListTypes.types.LINKED.equals(type)){
             return new LinkedTaskList();
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(String.valueOf(type));
         }
     }
 }
