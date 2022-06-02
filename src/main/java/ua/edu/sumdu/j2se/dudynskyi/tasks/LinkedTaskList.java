@@ -86,6 +86,16 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
         return null;
     }
 
+    public LinkedTaskList incoming(int from, int to) {
+        LinkedTaskList result = new LinkedTaskList();
+        for (int i = 0; i < size(); i++) {
+            if (getTask(i).nextTimeAfter(from) > from && getTask(i).nextTimeAfter(to) < to) {
+                result.add(getTask(i));
+            }
+        }
+        return result;
+    }
+
     @Override
     public Iterator<Task> iterator() {
         return new Iter();

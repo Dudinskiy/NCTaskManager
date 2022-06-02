@@ -83,6 +83,16 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
         return taskList[index];
     }
 
+    public ArrayTaskList incoming(int from, int to) {
+        ArrayTaskList result = new ArrayTaskList();
+        for (int i = 0; i < size(); i++) {
+            if (getTask(i).nextTimeAfter(from) > from && getTask(i).nextTimeAfter(to) < to) {
+                result.add(getTask(i));
+            }
+        }
+        return result;
+    }
+
     @Override
     public Iterator<Task> iterator() {
         return new Iter();
