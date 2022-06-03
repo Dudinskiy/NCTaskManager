@@ -11,37 +11,45 @@ public class Task implements Cloneable {
     private boolean active;
 
     /**
-     * Данный конструктор создает неактивную задачу, которая выполняется один раз.
+     * Данный конструктор создает неактивную
+     * задачу, которая выполняется один раз.
      *
      * @param title название задачи.
      * @param time  время выполнения задачи.
      */
     public Task(String title, int time) {
         if (time < 0) {
-            throw new IllegalArgumentException("Время не может быть отрицательным");
+            throw new IllegalArgumentException("Время не может" +
+                    " быть отрицательным");
         }
         this.title = title;
         this.time = time;
     }
 
+
     /**
-     * Данный конструктор создает неактивную задачу, которая выполняется
-     * в заданном промежутке времени с заданным интервалом.
+     * Данный конструктор создает неактивную задачу,
+     * которая выполняется в заданном промежутке времени
+     * с заданным интервалом.
      *
      * @param title    вазвание задачи.
      * @param start    время начала выполнения задачи.
      * @param end      время окончания выполнения задачи.
-     * @param interval интервал времени, с которым выполняется задача.
+     * @param interval интервал времени, с которым выполняется
+     *                 задача.
      */
     public Task(String title, int start, int end, int interval) {
         if (start < 0 || end < 0) {
-            throw new IllegalArgumentException("Время не должно быть отрицательным");
+            throw new IllegalArgumentException("Время не должно" +
+                    " быть отрицательным");
         }
         if (start >= end) {
-            throw new IllegalArgumentException("Время начала задачи должно быть меньше времени конца");
+            throw new IllegalArgumentException("Время начала" +
+                    " задачи должно быть меньше времени конца");
         }
         if (interval <= 0) {
-            throw new IllegalArgumentException("Интервал должен быть больше 0");
+            throw new IllegalArgumentException("Интервал должен " +
+                    "быть больше 0");
         }
         this.title = title;
         this.startTime = start;
@@ -88,7 +96,8 @@ public class Task implements Cloneable {
     /**
      * Метод возвращает время выполнения задачи.
      *
-     * @return в случае если задача повторяемая, возвращается время начала выполнения задачи.
+     * @return в случае если задача повторяемая, возвращается
+     * время начала выполнения задачи.
      */
     public int getTime() {
         if (isRepeated()) {
@@ -99,7 +108,8 @@ public class Task implements Cloneable {
     }
 
     /**
-     * Метод устанавливает время выполнения неповторяемой задачи. Если задача была повторяемой
+     * Метод устанавливает время выполнения неповторяемой задачи.
+     * Если задача была повторяемой
      * метод делает ее неповторяемой.
      *
      * @param time значение должно быть больше 0.
@@ -114,9 +124,11 @@ public class Task implements Cloneable {
     }
 
     /**
-     * Метод возвращает время начала выполнения повторяемой задачи.
+     * Метод возвращает время начала выполнения
+     * повторяемой задачи.
      *
-     * @return если задача неповторяемая, возвращается время выполения задачи.
+     * @return если задача неповторяемая, возвращается
+     * время выполения задачи.
      */
     public int getStartTime() {
         if (isRepeated()) {
@@ -129,7 +141,8 @@ public class Task implements Cloneable {
     /**
      * Метод возвращает время окончания выполения повторяемой задачи.
      *
-     * @return если задача неповторяемая, возвращается время выполения задачи.
+     * @return если задача неповторяемая, возвращается
+     * время выполения задачи.
      */
     public int getEndTime() {
         if (isRepeated()) {
@@ -179,7 +192,8 @@ public class Task implements Cloneable {
      * относительно текущего момента времени.
      *
      * @param current текущее время.
-     * @return если задача неактивна или завершена
+     * @return если задача неактивна или
+     * завершена
      * возвращается -1.
      */
     public int nextTimeAfter(int current) {
@@ -209,6 +223,11 @@ public class Task implements Cloneable {
     }
 
     @Override
+    public Task clone() throws CloneNotSupportedException {
+        return (Task) super.clone();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -227,8 +246,7 @@ public class Task implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTitle()
-                , getTime()
+        return Objects.hash(getTitle(), getTime()
                 , getStartTime()
                 , getEndTime()
                 , getRepeatInterval()
@@ -236,19 +254,13 @@ public class Task implements Cloneable {
     }
 
     @Override
-    public Task clone() throws CloneNotSupportedException {
-        return (Task) super.clone();
-    }
-
-    @Override
     public String toString() {
-        return "Task{" +
-                "title='" + title + '\'' +
-                ", time=" + time +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", repeatInterval=" + repeatInterval +
-                ", active=" + active +
-                '}';
+        return "Task{" + "title='" + title + '\''
+                + ", time=" + time
+                + ", startTime=" + startTime
+                + ", endTime=" + endTime
+                + ", repeatInterval=" + repeatInterval
+                + ", active=" + active
+                + '}';
     }
 }

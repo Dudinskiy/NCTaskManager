@@ -1,14 +1,18 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.Objects;
+import java.util.NoSuchElementException;
 
 public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
     private Node first;
     private Node last;
 
+    public LinkedTaskList() {
+        type = ListTypes.types.LINKED;
+    }
 
     public void add(Task task) {
         if (task == null) {
@@ -47,6 +51,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
                     nextNode.previous = previousNode;
                 }
                 taskAmount--;
+                modCount++;
                 return true;
             }
             currentNode = currentNode.next;
@@ -110,6 +115,12 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
     }
 
     @Override
+    public int hashCode() {
+        Task[] arr = listToArray();
+        return Arrays.hashCode(arr);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -126,24 +137,6 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
     }
 
     @Override
-    public int hashCode() {
-        Task[] arr = listToArray();
-        return Arrays.hashCode(arr);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("LinkedTaskList{\n");
-        Task[] arr = listToArray();
-        for (Task task : arr) {
-            sb.append(task.toString()).append(",").append("\n");
-        }
-        sb.append(", taskAmount=").append(taskAmount).append('}');
-
-        return sb.toString();
-    }
-
-    @Override
     public LinkedTaskList clone() throws CloneNotSupportedException {
         LinkedTaskList clone = (LinkedTaskList) super.clone();
         Task[] arr = listToArray();
@@ -155,6 +148,25 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
             clone.add(taskClone);
         }
         return clone;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("LinkedTaskList{");
+        if (taskAmount != 0) {
+            Task[] arr = listToArray();
+            sb.append("taskAmount=").append(taskAmount).append(",\n");
+            for (int i = 0; i < taskAmount; i++) {
+                if (i != taskAmount - 1) {
+                    sb.append(arr[i].toString()).append(",").append("\n");
+                } else {
+                    sb.append(arr[i].toString()).append("}");
+                }
+            }
+        } else {
+            sb.append("taskAmount=").append(taskAmount).append("}");
+        }
+        return sb.toString();
     }
 
     private static class Node {
@@ -173,6 +185,8 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
         int nextForReturn;
         int lastReturned = -1;
+        int expectModCount = modCount;
+        Task[] arr = listToArray();
 
         @Override
         public boolean hasNext() {
@@ -181,8 +195,16 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
         @Override
         public Task next() {
+            if (nextForReturn >= taskAmount) {
+                throw new NoSuchElementException();
+            }
+            if (expectModCount != modCount) {
+                throw new ConcurrentModificationException();
+            }
             lastReturned = nextForReturn;
-            Task[] arr = listToArray();
+            if (arr.length != taskAmount) {
+                arr = listToArray();
+            }
             Task task = arr[lastReturned];
             nextForReturn++;
             return task;
@@ -196,6 +218,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
             Task task = getTask(lastReturned);
             LinkedTaskList.this.remove(task);
             nextForReturn--;
+            expectModCount = modCount;
         }
     }
 }

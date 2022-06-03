@@ -1,7 +1,9 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class ArrayTaskList extends AbstractTaskList implements Cloneable {
     private Task[] taskList;
@@ -13,6 +15,7 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
      */
     public ArrayTaskList() {
         taskList = new Task[DEFAULT_CAPACITY];
+        type = ListTypes.types.ARRAY;
     }
 
     /**
@@ -22,6 +25,7 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
      */
     public ArrayTaskList(int size) {
         taskList = new Task[size];
+        type = ListTypes.types.ARRAY;
     }
 
     /**
@@ -99,42 +103,8 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
     }
 
     @Override
-    public ArrayTaskList clone() throws CloneNotSupportedException {
-        ArrayTaskList clone = (ArrayTaskList) super.clone();
-        clone.taskList = taskList.clone();
-        for (int i = 0; i < size(); i++) {
-            Task taskClone = taskList[i].clone();
-            clone.taskList[i] = taskClone;
-        }
-        return clone;
-    }
-
-    private class Iter implements Iterator<Task> {
-
-        int nextForReturn;
-        int lastReturned = -1;
-
-        @Override
-        public boolean hasNext() {
-            return nextForReturn < taskAmount;
-        }
-
-        @Override
-        public Task next() {
-            lastReturned = nextForReturn;
-            nextForReturn++;
-            return taskList[lastReturned];
-        }
-
-        @Override
-        public void remove() {
-            if (lastReturned < 0) {
-                throw new IllegalStateException();
-            }
-            Task task = taskList[lastReturned];
-            ArrayTaskList.this.remove(task);
-            nextForReturn--;
-        }
+    public int hashCode() {
+        return Arrays.hashCode(taskList);
     }
 
     @Override
@@ -150,18 +120,67 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
     }
 
     @Override
-    public int hashCode() {
-        return Arrays.hashCode(taskList);
+    public ArrayTaskList clone() throws CloneNotSupportedException {
+        ArrayTaskList clone = (ArrayTaskList) super.clone();
+        clone.taskList = taskList.clone();
+        for (int i = 0; i < size(); i++) {
+            Task taskClone = taskList[i].clone();
+            clone.taskList[i] = taskClone;
+        }
+        return clone;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ArrayTaskList{\n");
-        for (int i = 0; i < taskAmount; i++) {
-            sb.append(taskList[i].toString()).append(",").append("\n");
+        StringBuilder sb = new StringBuilder("ArrayTaskList{");
+        if (taskAmount != 0) {
+            sb.append("taskAmount=").append(taskAmount).append(",\n");
+            for (int i = 0; i < taskAmount; i++) {
+                if (i != taskAmount - 1) {
+                    sb.append(taskList[i].toString()).append(",").append("\n");
+                } else {
+                    sb.append(taskList[i].toString()).append("}");
+                }
+            }
+        } else {
+            sb.append("taskAmount=").append(taskAmount).append("}");
         }
-        sb.append(", taskAmount=").append(taskAmount).append('}');
-
         return sb.toString();
+    }
+
+    private class Iter implements Iterator<Task> {
+
+        int nextForReturn;
+        int lastReturned = -1;
+        int expectModCount = modCount;
+
+        @Override
+        public boolean hasNext() {
+            return nextForReturn < taskAmount;
+        }
+
+        @Override
+        public Task next() {
+            if (nextForReturn >= taskAmount) {
+                throw new NoSuchElementException();
+            }
+            if (expectModCount != modCount) {
+                throw new ConcurrentModificationException();
+            }
+            lastReturned = nextForReturn;
+            nextForReturn++;
+            return taskList[lastReturned];
+        }
+
+        @Override
+        public void remove() {
+            if (lastReturned < 0) {
+                throw new IllegalStateException();
+            }
+            Task task = taskList[lastReturned];
+            ArrayTaskList.this.remove(task);
+            nextForReturn--;
+            expectModCount = modCount;
+        }
     }
 }
