@@ -1,14 +1,21 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
-public class ArrayTaskList extends AbstractTaskList{
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class ArrayTaskList extends AbstractTaskList implements Cloneable {
     private Task[] taskList;
+    private static final int DEFAULT_CAPACITY = 10;
 
 
     /**
      * Данный конструктор создает список задач с размером по умолчанию 10.
      */
     public ArrayTaskList() {
-        taskList = new Task[10];
+        taskList = new Task[DEFAULT_CAPACITY];
+        type = ListTypes.types.ARRAY;
     }
 
     /**
@@ -18,6 +25,7 @@ public class ArrayTaskList extends AbstractTaskList{
      */
     public ArrayTaskList(int size) {
         taskList = new Task[size];
+        type = ListTypes.types.ARRAY;
     }
 
     /**
@@ -77,5 +85,102 @@ public class ArrayTaskList extends AbstractTaskList{
             throw new IndexOutOfBoundsException();
         }
         return taskList[index];
+    }
+
+    public ArrayTaskList incoming(int from, int to) {
+        ArrayTaskList result = new ArrayTaskList();
+        for (int i = 0; i < size(); i++) {
+            if (getTask(i).nextTimeAfter(from) > from && getTask(i).nextTimeAfter(to) < to) {
+                result.add(getTask(i));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Iterator<Task> iterator() {
+        return new Iter();
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(taskList);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ArrayTaskList)) {
+            return false;
+        }
+        ArrayTaskList taskList1 = (ArrayTaskList) o;
+        return Arrays.equals(taskList, taskList1.taskList);
+    }
+
+    @Override
+    public ArrayTaskList clone() throws CloneNotSupportedException {
+        ArrayTaskList clone = (ArrayTaskList) super.clone();
+        clone.taskList = taskList.clone();
+        for (int i = 0; i < size(); i++) {
+            Task taskClone = taskList[i].clone();
+            clone.taskList[i] = taskClone;
+        }
+        return clone;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("ArrayTaskList{");
+        if (taskAmount != 0) {
+            sb.append("taskAmount=").append(taskAmount).append(",\n");
+            for (int i = 0; i < taskAmount; i++) {
+                if (i != taskAmount - 1) {
+                    sb.append(taskList[i].toString()).append(",").append("\n");
+                } else {
+                    sb.append(taskList[i].toString()).append("}");
+                }
+            }
+        } else {
+            sb.append("taskAmount=").append(taskAmount).append("}");
+        }
+        return sb.toString();
+    }
+
+    private class Iter implements Iterator<Task> {
+
+        int nextForReturn;
+        int lastReturned = -1;
+        int expectModCount = modCount;
+
+        @Override
+        public boolean hasNext() {
+            return nextForReturn < taskAmount;
+        }
+
+        @Override
+        public Task next() {
+            if (nextForReturn >= taskAmount) {
+                throw new NoSuchElementException();
+            }
+            if (expectModCount != modCount) {
+                throw new ConcurrentModificationException();
+            }
+            lastReturned = nextForReturn;
+            nextForReturn++;
+            return taskList[lastReturned];
+        }
+
+        @Override
+        public void remove() {
+            if (lastReturned < 0) {
+                throw new IllegalStateException();
+            }
+            Task task = taskList[lastReturned];
+            ArrayTaskList.this.remove(task);
+            nextForReturn--;
+            expectModCount = modCount;
+        }
     }
 }

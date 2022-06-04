@@ -1,21 +1,29 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
-public class LinkedTaskList extends AbstractTaskList {
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-    private Cell first;
-    private Cell last;
+public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
+    private Node first;
+    private Node last;
+
+    public LinkedTaskList() {
+        type = ListTypes.types.LINKED;
+    }
 
     public void add(Task task) {
         if (task == null) {
             throw new IllegalArgumentException("Задача не должна быть равна null");
         }
         if (first == null) {
-            first = new Cell(task, null, null);
+            first = new Node(task, null, null);
             last = first;
         } else {
-            Cell previous = last;
-            last = new Cell(task, previous, null);
+            Node previous = last;
+            last = new Node(task, previous, null);
             previous.next = last;
         }
         taskAmount++;
@@ -25,27 +33,28 @@ public class LinkedTaskList extends AbstractTaskList {
         if (task == null) {
             throw new IllegalArgumentException("Задача не должна быть равна null");
         }
-        Cell currentCell = first;
-        Cell previousCell;
-        Cell nextCell;
+        Node currentNode = first;
+        Node previousNode;
+        Node nextNode;
         Task taskFromList;
         for (int i = 0; i < taskAmount; i++) {
-            taskFromList = currentCell.task;
+            taskFromList = currentNode.task;
             if (taskFromList.equals(task)) {
-                if (currentCell.equals(first)) {
+                if (currentNode.equals(first)) {
                     first = first.next;
-                } else if (currentCell.equals(last)) {
+                } else if (currentNode.equals(last)) {
                     last = last.previous;
                 } else {
-                    previousCell = currentCell.previous;
-                    nextCell = currentCell.next;
-                    previousCell.next = nextCell;
-                    nextCell.previous = previousCell;
+                    previousNode = currentNode.previous;
+                    nextNode = currentNode.next;
+                    previousNode.next = nextNode;
+                    nextNode.previous = previousNode;
                 }
                 taskAmount--;
+                modCount++;
                 return true;
             }
-            currentCell = currentCell.next;
+            currentNode = currentNode.next;
         }
         return false;
     }
@@ -58,27 +67,158 @@ public class LinkedTaskList extends AbstractTaskList {
         if (index > size()) {
             throw new IndexOutOfBoundsException();
         }
-        Cell currentCell = first;
+        Node currentNode;
         Task taskFromList;
-        for (int i = 0; i <= index; i++) {
-            taskFromList = currentCell.task;
-            if (i == index) {
-                return taskFromList;
+        if (index <= size() / 2) {
+            currentNode = first;
+            for (int i = 0; i <= index; i++) {
+                taskFromList = currentNode.task;
+                if (i == index) {
+                    return taskFromList;
+                }
+                currentNode = currentNode.next;
             }
-            currentCell = currentCell.next;
+        } else {
+            currentNode = last;
+            for (int i = 1; i <= size() - index; i++) {
+                taskFromList = currentNode.task;
+                if (i == (size() - index)) {
+                    return taskFromList;
+                }
+                currentNode = currentNode.previous;
+            }
         }
         return null;
     }
 
-    private static class Cell {
-        Task task;
-        Cell previous;
-        Cell next;
+    public LinkedTaskList incoming(int from, int to) {
+        LinkedTaskList result = new LinkedTaskList();
+        for (int i = 0; i < size(); i++) {
+            if (getTask(i).nextTimeAfter(from) > from && getTask(i).nextTimeAfter(to) < to) {
+                result.add(getTask(i));
+            }
+        }
+        return result;
+    }
 
-        private Cell(Task task, Cell previous, Cell next) {
+    @Override
+    public Iterator<Task> iterator() {
+        return new Iter();
+    }
+
+    public Task[] listToArray() {
+        Task[] arr = new Task[taskAmount];
+        for (int i = 0; i < taskAmount; i++) {
+            arr[i] = getTask(i);
+        }
+        return arr;
+    }
+
+    @Override
+    public int hashCode() {
+        Task[] arr = listToArray();
+        return Arrays.hashCode(arr);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof LinkedTaskList)) {
+            return false;
+        }
+        LinkedTaskList list = (LinkedTaskList) o;
+
+        Task[] arr1 = listToArray();
+        Task[] arr2 = list.listToArray();
+
+        return Arrays.equals(arr1, arr2);
+    }
+
+    @Override
+    public LinkedTaskList clone() throws CloneNotSupportedException {
+        LinkedTaskList clone = (LinkedTaskList) super.clone();
+        Task[] arr = listToArray();
+        clone.first = null;
+        clone.last = null;
+        clone.taskAmount = 0;
+        for (Task task : arr) {
+            Task taskClone = task.clone();
+            clone.add(taskClone);
+        }
+        return clone;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("LinkedTaskList{");
+        if (taskAmount != 0) {
+            Task[] arr = listToArray();
+            sb.append("taskAmount=").append(taskAmount).append(",\n");
+            for (int i = 0; i < taskAmount; i++) {
+                if (i != taskAmount - 1) {
+                    sb.append(arr[i].toString()).append(",").append("\n");
+                } else {
+                    sb.append(arr[i].toString()).append("}");
+                }
+            }
+        } else {
+            sb.append("taskAmount=").append(taskAmount).append("}");
+        }
+        return sb.toString();
+    }
+
+    private static class Node {
+        Task task;
+        Node previous;
+        Node next;
+
+        private Node(Task task, Node previous, Node next) {
             this.task = task;
             this.previous = previous;
             this.next = next;
+        }
+    }
+
+    private class Iter implements Iterator<Task> {
+
+        int nextForReturn;
+        int lastReturned = -1;
+        int expectModCount = modCount;
+        Task[] arr = listToArray();
+
+        @Override
+        public boolean hasNext() {
+            return nextForReturn < taskAmount;
+        }
+
+        @Override
+        public Task next() {
+            if (nextForReturn >= taskAmount) {
+                throw new NoSuchElementException();
+            }
+            if (expectModCount != modCount) {
+                throw new ConcurrentModificationException();
+            }
+            lastReturned = nextForReturn;
+            if (arr.length != taskAmount) {
+                arr = listToArray();
+            }
+            Task task = arr[lastReturned];
+            nextForReturn++;
+            return task;
+        }
+
+        @Override
+        public void remove() {
+            if (lastReturned < 0) {
+                throw new IllegalStateException();
+            }
+            Task task = getTask(lastReturned);
+            LinkedTaskList.this.remove(task);
+            nextForReturn--;
+            expectModCount = modCount;
         }
     }
 }
