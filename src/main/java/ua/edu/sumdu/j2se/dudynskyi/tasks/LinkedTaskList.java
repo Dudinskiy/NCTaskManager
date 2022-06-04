@@ -27,6 +27,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
             previous.next = last;
         }
         taskAmount++;
+        modCount++;
     }
 
     public boolean remove(Task task) {
@@ -147,6 +148,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
             Task taskClone = task.clone();
             clone.add(taskClone);
         }
+        clone.modCount = 0;
         return clone;
     }
 

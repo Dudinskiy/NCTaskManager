@@ -42,6 +42,7 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
             }
             taskList[taskAmount] = task;
             taskAmount++;
+            modCount++;
         }
     }
 
@@ -58,6 +59,7 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
                     System.arraycopy(taskList, (i + 1), taskList, i, size() - (i + 1));
                     taskList[taskAmount - 1] = null;
                     taskAmount--;
+                    modCount++;
                     return true;
                 }
             }
@@ -127,6 +129,7 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
             Task taskClone = taskList[i].clone();
             clone.taskList[i] = taskClone;
         }
+        clone.modCount = 0;
         return clone;
     }
 
