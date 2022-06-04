@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 public class ArrayTaskList extends AbstractTaskList implements Cloneable {
     private Task[] taskList;
@@ -89,14 +90,9 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
         return taskList[index];
     }
 
-    public ArrayTaskList incoming(int from, int to) {
-        ArrayTaskList result = new ArrayTaskList();
-        for (int i = 0; i < size(); i++) {
-            if (getTask(i).nextTimeAfter(from) > from && getTask(i).nextTimeAfter(to) < to) {
-                result.add(getTask(i));
-            }
-        }
-        return result;
+    @Override
+    public Stream<Task> getStream() {
+        return Stream.of(taskList);
     }
 
     @Override
