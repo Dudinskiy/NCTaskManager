@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
@@ -92,14 +93,9 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
         return null;
     }
 
-    public LinkedTaskList incoming(int from, int to) {
-        LinkedTaskList result = new LinkedTaskList();
-        for (int i = 0; i < size(); i++) {
-            if (getTask(i).nextTimeAfter(from) > from && getTask(i).nextTimeAfter(to) < to) {
-                result.add(getTask(i));
-            }
-        }
-        return result;
+    @Override
+    public Stream<Task> getStream() {
+        return Stream.of(listToArray());
     }
 
     @Override

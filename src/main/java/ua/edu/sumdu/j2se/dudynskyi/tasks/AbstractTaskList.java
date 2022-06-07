@@ -1,5 +1,7 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
+import java.util.stream.Stream;
+
 public abstract class AbstractTaskList implements Iterable<Task> {
     protected int taskAmount;
     protected ListTypes.types type;
@@ -13,14 +15,14 @@ public abstract class AbstractTaskList implements Iterable<Task> {
 
     public abstract Task getTask(int index);
 
-    public AbstractTaskList incoming(int from, int to) {
+    public  abstract Stream<Task> getStream();
+
+    public final AbstractTaskList incoming(int from, int to) {
         AbstractTaskList result = TaskListFactory.createTaskList(type);
-        for (int i = 0; i < size(); i++) {
-            if (getTask(i).nextTimeAfter(from) > from
-                  && getTask(i).nextTimeAfter(to) < to) {
-                result.add(getTask(i));
-            }
-        }
+        Stream<Task> stream = getStream();
+        stream.filter(task -> task.nextTimeAfter(from) > from)
+                .filter(task -> task.nextTimeAfter(to) < to)
+                .forEach(result::add);
         return result;
     }
 }
