@@ -1,12 +1,13 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task implements Cloneable {
     private String title;
-    private int time;
-    private int startTime;
-    private int endTime;
+    private LocalDateTime time;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private int repeatInterval;
     private boolean active;
 
@@ -17,10 +18,9 @@ public class Task implements Cloneable {
      * @param title название задачи.
      * @param time  время выполнения задачи.
      */
-    public Task(String title, int time) {
-        if (time < 0) {
-            throw new IllegalArgumentException("Время не может" +
-                    " быть отрицательным");
+    public Task(String title, LocalDateTime time) {
+        if (time == null) {
+            throw new IllegalArgumentException("");
         }
         this.title = title;
         this.time = time;
@@ -38,19 +38,7 @@ public class Task implements Cloneable {
      * @param interval интервал времени, с которым выполняется
      *                 задача.
      */
-    public Task(String title, int start, int end, int interval) {
-        if (start < 0 || end < 0) {
-            throw new IllegalArgumentException("Время не должно" +
-                    " быть отрицательным");
-        }
-        if (start >= end) {
-            throw new IllegalArgumentException("Время начала" +
-                    " задачи должно быть меньше времени конца");
-        }
-        if (interval <= 0) {
-            throw new IllegalArgumentException("Интервал должен " +
-                    "быть больше 0");
-        }
+    public Task(String title, LocalDateTime start, LocalDateTime end, int interval) {
         this.title = title;
         this.startTime = start;
         this.endTime = end;
@@ -99,7 +87,7 @@ public class Task implements Cloneable {
      * @return в случае если задача повторяемая, возвращается
      * время начала выполнения задачи.
      */
-    public int getTime() {
+    public LocalDateTime getTime() {
         if (isRepeated()) {
             return startTime;
         } else {
@@ -114,7 +102,7 @@ public class Task implements Cloneable {
      *
      * @param time значение должно быть больше 0.
      */
-    public void setTime(int time) {
+    public void setTime(LocalDateTime time) {
         if (isRepeated()) {
             this.startTime = time;
             this.endTime = time;
@@ -130,7 +118,7 @@ public class Task implements Cloneable {
      * @return если задача неповторяемая, возвращается
      * время выполения задачи.
      */
-    public int getStartTime() {
+    public LocalDateTime getStartTime() {
         if (isRepeated()) {
             return startTime;
         } else {
@@ -144,7 +132,7 @@ public class Task implements Cloneable {
      * @return если задача неповторяемая, возвращается
      * время выполения задачи.
      */
-    public int getEndTime() {
+    public LocalDateTime getEndTime() {
         if (isRepeated()) {
             return endTime;
         } else {
@@ -169,7 +157,7 @@ public class Task implements Cloneable {
      * @param end      значение должно быть больше 0.
      * @param interval значение должно быть больше или равно 1.
      */
-    public void setTime(int start, int end, int interval) {
+    public void setTime(LocalDateTime start, LocalDateTime end, int interval) {
         if (!isRepeated()) {
             this.time = start;
         }
@@ -196,29 +184,31 @@ public class Task implements Cloneable {
      * завершена
      * возвращается -1.
      */
-    public int nextTimeAfter(int current) {
+    public LocalDateTime nextTimeAfter(LocalDateTime current) {
         if (!isActive()) {
-            return -1;
+            return null/*-1*/;
         }
         if (isRepeated()) {
-            if (startTime > current) {
+            if (startTime.isAfter(current)/*startTime > current*/) {
                 return startTime;
-            } else if ((endTime - repeatInterval) <= current) {
-                return -1;
+            } else if (endTime.minusSeconds(repeatInterval).isBefore(current)
+                    || endTime.minusSeconds(repeatInterval).equals(current)
+                /*(endTime - repeatInterval) <= current*/) {
+                return null/*-1*/;
             } else {
-                int nextTaskTime = startTime;
+                LocalDateTime nextTaskTime = startTime;
                 while (true) {
-                    nextTaskTime = nextTaskTime + repeatInterval;
+                    nextTaskTime = nextTaskTime.plusSeconds(repeatInterval)/*nextTaskTime + repeatInterval*/;
 
-                    if (nextTaskTime > current) {
+                    if (nextTaskTime.isAfter(current)/*nextTaskTime > current*/) {
                         return nextTaskTime;
                     }
                 }
             }
-        } else if (time > current) {
+        } else if (time.isAfter(current)/*time > current*/) {
             return time;
         } else {
-            return -1;
+            return null/*-1*/;
         }
     }
 

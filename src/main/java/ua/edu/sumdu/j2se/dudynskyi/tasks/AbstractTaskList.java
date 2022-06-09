@@ -1,5 +1,6 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 public abstract class AbstractTaskList implements Iterable<Task> {
@@ -17,12 +18,12 @@ public abstract class AbstractTaskList implements Iterable<Task> {
 
     public  abstract Stream<Task> getStream();
 
-    public final AbstractTaskList incoming(int from, int to) {
-        AbstractTaskList result = TaskListFactory.createTaskList(type);
-        Stream<Task> stream = getStream();
-        stream.filter(task -> task.nextTimeAfter(from) > from)
-                .filter(task -> task.nextTimeAfter(to) < to)
-                .forEach(result::add);
-        return result;
-    }
+//    public final AbstractTaskList incoming(LocalDateTime from, LocalDateTime to) {
+//        AbstractTaskList result = TaskListFactory.createTaskList(type);
+//        Stream<Task> stream = getStream();
+//        stream.filter(task -> task.nextTimeAfter(from).isAfter(from)/*task.nextTimeAfter(from) > from*/)
+//                .filter(task -> task.nextTimeAfter(to).isBefore(to)/*task.nextTimeAfter(to) < to*/)
+//                .forEach(result::add);
+//        return result;
+//    }
 }
