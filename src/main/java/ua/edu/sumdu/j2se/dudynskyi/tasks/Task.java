@@ -186,29 +186,30 @@ public class Task implements Cloneable {
      */
     public LocalDateTime nextTimeAfter(LocalDateTime current) {
         if (!isActive()) {
-            return null/*-1*/;
+            return null;
         }
         if (isRepeated()) {
-            if (startTime.isAfter(current)/*startTime > current*/) {
+            if (startTime.isAfter(current)) {
                 return startTime;
-            } else if (endTime.minusSeconds(repeatInterval).isBefore(current)
-                    || endTime.minusSeconds(repeatInterval).equals(current)
-                /*(endTime - repeatInterval) <= current*/) {
-                return null/*-1*/;
+            } else if (endTime.isBefore(current)) {
+                return null;
             } else {
                 LocalDateTime nextTaskTime = startTime;
-                while (true) {
-                    nextTaskTime = nextTaskTime.plusSeconds(repeatInterval)/*nextTaskTime + repeatInterval*/;
+                while (nextTaskTime.isBefore(endTime) || nextTaskTime.isEqual(endTime)) {
+                    nextTaskTime = nextTaskTime.plusSeconds(repeatInterval);
 
-                    if (nextTaskTime.isAfter(current)/*nextTaskTime > current*/) {
+                    if (nextTaskTime.isAfter(current)
+                            && (nextTaskTime.isBefore(endTime)
+                            || nextTaskTime.isEqual(endTime))) {
                         return nextTaskTime;
                     }
                 }
+                return null;
             }
-        } else if (time.isAfter(current)/*time > current*/) {
+        } else if (time.isAfter(current)) {
             return time;
         } else {
-            return null/*-1*/;
+            return null;
         }
     }
 
@@ -226,9 +227,9 @@ public class Task implements Cloneable {
             return false;
         }
         Task task = (Task) o;
-        return getTime() == task.getTime()
-                && getStartTime() == task.getStartTime()
-                && getEndTime() == task.getEndTime()
+        return getTime().equals(task.getTime())
+                && getStartTime().equals(task.getStartTime())
+                && getEndTime().equals(task.getEndTime())
                 && getRepeatInterval() == task.getRepeatInterval()
                 && isActive() == task.isActive()
                 && getTitle().equals(task.getTitle());

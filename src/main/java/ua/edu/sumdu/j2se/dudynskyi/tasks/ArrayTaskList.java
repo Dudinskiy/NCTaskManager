@@ -92,7 +92,13 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
 
     @Override
     public Stream<Task> getStream() {
-        return Stream.of(taskList);
+        return Stream.of(fullArray());
+    }
+
+    public Task[] fullArray(){
+        Task [] result = new Task[taskAmount];
+        System.arraycopy(taskList, 0, result, 0, taskAmount);
+        return result;
     }
 
     @Override
