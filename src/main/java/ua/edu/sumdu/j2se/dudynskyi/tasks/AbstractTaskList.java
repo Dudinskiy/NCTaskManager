@@ -1,14 +1,13 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
-import java.io.Serializable;
+
 import java.util.stream.Stream;
 
-public abstract class AbstractTaskList implements Iterable<Task>, Serializable {
+public abstract class AbstractTaskList implements Iterable<Task> {
 
-    private static final long serialVersionUID = 21L;
-    protected int taskAmount;
+   protected int taskAmount;
     protected ListTypes.types type;
-    protected transient int modCount;
+    protected int modCount;
 
 
     public abstract void add(Task task);
@@ -20,6 +19,4 @@ public abstract class AbstractTaskList implements Iterable<Task>, Serializable {
     public abstract Task getTask(int index);
 
     public abstract Stream<Task> getStream();
-
-
 }
