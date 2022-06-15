@@ -15,6 +15,7 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
      * Данный конструктор создает список задач с размером по умолчанию 10.
      */
     public ArrayTaskList() {
+        super();
         taskList = new Task[DEFAULT_CAPACITY];
         type = ListTypes.types.ARRAY;
     }
@@ -92,13 +93,7 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
 
     @Override
     public Stream<Task> getStream() {
-        return Stream.of(fullArray());
-    }
-
-    public Task[] fullArray(){
-        Task [] result = new Task[taskAmount];
-        System.arraycopy(taskList, 0, result, 0, taskAmount);
-        return result;
+        return Stream.of(toArray());
     }
 
     @Override

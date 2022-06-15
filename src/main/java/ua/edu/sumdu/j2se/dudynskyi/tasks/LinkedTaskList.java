@@ -1,5 +1,6 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -12,6 +13,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
     private Node last;
 
     public LinkedTaskList() {
+        super();
         type = ListTypes.types.LINKED;
     }
 
@@ -95,7 +97,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
     @Override
     public Stream<Task> getStream() {
-        return Stream.of(listToArray());
+        return Stream.of(toArray());
     }
 
     @Override
@@ -103,17 +105,10 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
         return new Iter();
     }
 
-    public Task[] listToArray() {
-        Task[] arr = new Task[taskAmount];
-        for (int i = 0; i < taskAmount; i++) {
-            arr[i] = getTask(i);
-        }
-        return arr;
-    }
 
     @Override
     public int hashCode() {
-        Task[] arr = listToArray();
+        Task[] arr = toArray();
         return Arrays.hashCode(arr);
     }
 
@@ -127,8 +122,8 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
         }
         LinkedTaskList list = (LinkedTaskList) o;
 
-        Task[] arr1 = listToArray();
-        Task[] arr2 = list.listToArray();
+        Task[] arr1 = toArray();
+        Task[] arr2 = list.toArray();
 
         return Arrays.equals(arr1, arr2);
     }
@@ -136,7 +131,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
     @Override
     public LinkedTaskList clone() throws CloneNotSupportedException {
         LinkedTaskList clone = (LinkedTaskList) super.clone();
-        Task[] arr = listToArray();
+        Task[] arr = toArray();
         clone.first = null;
         clone.last = null;
         clone.taskAmount = 0;
@@ -152,7 +147,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
     public String toString() {
         StringBuilder sb = new StringBuilder("LinkedTaskList{");
         if (taskAmount != 0) {
-            Task[] arr = listToArray();
+            Task[] arr = toArray();
             sb.append("taskAmount=").append(taskAmount).append(",\n");
             for (int i = 0; i < taskAmount; i++) {
                 if (i != taskAmount - 1) {
@@ -167,7 +162,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
         return sb.toString();
     }
 
-    private static class Node {
+    private static class Node implements Serializable {
         Task task;
         Node previous;
         Node next;
@@ -184,7 +179,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
         int nextForReturn;
         int lastReturned = -1;
         int expectModCount = modCount;
-        Task[] arr = listToArray();
+        Task[] arr = toArray();
 
         @Override
         public boolean hasNext() {
@@ -201,7 +196,7 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
             }
             lastReturned = nextForReturn;
             if (arr.length != taskAmount) {
-                arr = listToArray();
+                arr = toArray();
             }
             Task task = arr[lastReturned];
             nextForReturn++;
