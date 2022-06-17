@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 public class ArrayTaskList extends AbstractTaskList implements Cloneable {
+
+    private static final long serialVersionUID = 21L;
     private Task[] taskList;
     private static final int DEFAULT_CAPACITY = 10;
 
@@ -89,14 +91,6 @@ public class ArrayTaskList extends AbstractTaskList implements Cloneable {
             throw new IndexOutOfBoundsException();
         }
         return taskList[index];
-    }
-
-    public Task[] toArray() {
-        Task[] result = new Task[taskAmount];
-        for (int i = 0; i < taskAmount; i++) {
-            result[i] = getTask(i);
-        }
-        return result;
     }
 
     @Override
