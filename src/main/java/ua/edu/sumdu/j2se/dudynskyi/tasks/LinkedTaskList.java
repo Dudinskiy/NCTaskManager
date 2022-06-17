@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 public class LinkedTaskList extends AbstractTaskList implements Cloneable {
 
+    private static final long serialVersionUID = 21L;
     private Node first;
     private Node last;
 
@@ -93,14 +94,6 @@ public class LinkedTaskList extends AbstractTaskList implements Cloneable {
             }
         }
         return null;
-    }
-
-    public Task[] toArray() {
-        Task[] result = new Task[taskAmount];
-        for (int i = 0; i < taskAmount; i++) {
-            result[i] = getTask(i);
-        }
-        return result;
     }
 
     @Override
