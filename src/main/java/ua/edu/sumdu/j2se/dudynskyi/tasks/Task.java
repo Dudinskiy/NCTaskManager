@@ -1,12 +1,9 @@
 package ua.edu.sumdu.j2se.dudynskyi.tasks;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Task implements Cloneable, Serializable {
-
-    private static final long serialVersionUID = 21L;
+public class Task implements Cloneable {
     private String title;
     private LocalDateTime time;
     private LocalDateTime startTime;
